@@ -24,7 +24,28 @@ def create(request):
     new_blog.writer = request.POST['writer']
     new_blog.pub_date = timezone.now()
     new_blog.body = request.POST['body']
+    new_blog.image = request.FILES.get('image')
 
     new_blog.save()
 
-    return redirect('detail', new_blog.id)
+    return redirect('main:detail', new_blog.id)
+
+def edit(request, id):
+    edit_blog = Blog.objects.get(id = id)
+    return render(request, 'main/edit.html', {'blog' : edit_blog})
+
+def update(request, id):
+    new_blog = Blog.objects.get(id = id)
+    new_blog.title = request.POST['title']
+    new_blog.writer = request.POST['writer']
+    new_blog.pub_date = timezone.now()
+    new_blog.body = request.POST['body']
+
+    new_blog.save()
+
+    return redirect('main:detail', new_blog.id)
+
+def delete(request, id):
+    delete_blog = Blog.objects.get(id = id)
+    delete_blog.delete()
+    return redirect('main:mainpage')
