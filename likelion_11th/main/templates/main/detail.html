@@ -32,6 +32,10 @@
         <hr />
         <h4>작성자 : {{c.writer}}</h4>
         <p>내용 : {{c.content}}</p>
+        <p>
+            태그 : {% for tag in c.tags.all %}
+            <a href="{% url 'main:tag_blogs' tag.pk %}">{{ tag.name }}</a> {% endfor %}
+        </p>
         <p>{{c.pub_date}}</p>
         {% endfor %}
     </div>

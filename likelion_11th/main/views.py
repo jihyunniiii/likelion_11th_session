@@ -27,8 +27,15 @@ def detail(request, id):
         new_comment.blog = blog
         new_comment.writer = request.user
         new_comment.content = request.POST['content']
-        new_comment.pub_data = timezone.now()
+        new_comment.pub_date = timezone.now()
+        
         new_comment.save()
+
+        tag_list = [w[1:] for w in new_comment.content.split() if w.startswith('#')]
+
+        for t in tag_list:
+            tag, _ = Tag.objects.get_or_create(name=t)
+            new_comment.tags.add(tag)
         return redirect('main:detail', id)
 
 def create(request):
@@ -87,7 +94,10 @@ def tag_list(request):
 
 def tag_blogs(request, tag_id):
     tag = get_object_or_404(Tag, id = tag_id)
-    blogs = tag.blogs.all()
+    blogs_with_content_tags = Blog.objects.filter(tags=tag)
+    blogs_with_comment_tags = Blog.objects.filter(comment__tags=tag)
+
+    blogs = blogs_with_content_tags.union(blogs_with_comment_tags)
     return render(request, 'main/tag_blogs.html', {
         'tag' :tag,
         'blogs' : blogs,
