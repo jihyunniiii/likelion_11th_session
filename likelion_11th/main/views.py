@@ -42,16 +42,11 @@ def create(request):
 
         new_blog.save()
 
-        words = new_blog.body.split(' ')
-        tag_list = []
-        for w in words:
-            if len(w) > 0:
-                if w[0] == '#':
-                    tag_list.append(w[1:])
+        tag_list = [w[1:] for w in new_blog.body.split() if w.startswith('#')]
         
         for t in tag_list:
-            tag, boolean = Tag.objects.get_or_create(name=t)
-            new_blog.tags.add(tag.id)
+            tag, _ = Tag.objects.get_or_create(name=t)
+            new_blog.tags.add(tag)
         return redirect('main:detail', new_blog.id)
     else :
         return redirect('accounts:login')
@@ -62,15 +57,21 @@ def edit(request, id):
 
 def update(request, id):
     if request.user.is_authenticated:
-        new_blog = Blog.objects.get(id = id)
-        new_blog.title = request.POST['title']
-        new_blog.writer = request.POST['writer']
-        new_blog.pub_date = timezone.now()
-        new_blog.body = request.POST['body']
+        update_blog = Blog.objects.get(id = id)
+        update_blog.title = request.POST['title']
+        update_blog.pub_date = timezone.now()
+        update_blog.body = request.POST['body']
 
-        new_blog.save()
+        update_blog.save()
 
-        return redirect('main:detail', new_blog.id)
+        update_blog.tags.clear()
+        tag_list = [w[1:] for w in update_blog.body.split() if w.startswith('#')]
+
+        for t in tag_list:
+            tag, _ = Tag.objects.get_or_create(name=t)
+            update_blog.tags.add(tag)
+
+        return redirect('main:detail', update_blog.id)
     return redirect('accounts:login')
 
 def delete(request, id):

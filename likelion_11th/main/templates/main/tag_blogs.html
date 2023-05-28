@@ -8,8 +8,8 @@
         <h2 class="title">
             <a href="{% url 'main:detail' b.id %}">제목 : {{ b.title }}</a>
         </h2>
-        <h4>작성자 : {{b.writer }}</h4>
-        <p>내용 : {{ b.content }}</p>
+        <h4>작성자 : {{ b.writer }}</h4>
+        <p>내용 : {{ b.body }}</p>
     </div>
     <hr />
     {% endfor %}
